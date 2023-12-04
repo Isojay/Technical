@@ -86,7 +86,9 @@ public class CompanyService {
                details.setName(companyRequest.getName());
                message.append(" Company Name Changed");
            }
-
+            if(message.isEmpty()){
+                message.append("Nothing Changes");
+            }
             repo.save(details);
 
 

@@ -25,7 +25,7 @@ public class OTPservice {
     public String generateAndSendOTP(String phoneNumber) throws Exception {
 
         String otp = oTPgenerator.generateRandomString();
-
+        removeOTPS();
         User user =userRepo.findByPhNumber(phoneNumber);
 
         if(user != null) {

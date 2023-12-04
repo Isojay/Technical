@@ -4,6 +4,8 @@ import com.example.DemoTest.DTO.AuthRequest;
 import com.example.DemoTest.DTO.RegisterRequest;
 import com.example.DemoTest.Model.User;
 import com.example.DemoTest.Repository.UserRepo;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -53,6 +55,7 @@ public class UserService {
         try{
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getPhNumber(), request.getUPassword()));
+
             return true;
         }catch (BadCredentialsException e){
             System.out.println(e.getMessage());

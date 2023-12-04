@@ -5,6 +5,9 @@ import com.example.DemoTest.DTO.RegisterRequest;
 import com.example.DemoTest.Service.UserService;
 import com.example.DemoTest.Utils.OTPgenerator;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +42,6 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
         try {
-            System.out.println(registerRequest);
             userService.registerUser(registerRequest);
             return ResponseEntity.ok().body("User registration successful. \n Please verify phone Number to get access of your Account");
         } catch (Exception e) {
@@ -47,10 +49,12 @@ public class UserController {
         }
     }
     @GetMapping("/logIn")
-    public ResponseEntity<?> authUser(@RequestBody AuthRequest request){
+    public ResponseEntity<?> authUser(@RequestBody AuthRequest request , HttpServletRequest servletRequest){
         try {
-            System.out.println(request);
+
             if(userService.authenticate(request)){
+                HttpSession session = servletRequest.getSession();
+                System.out.println("Session ID: " + session.getId());
                 return new ResponseEntity<>("Log In Successful", HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("Mobile Verification Required. Please validate your login details and try again.", HttpStatus.UNAUTHORIZED);
@@ -61,14 +65,12 @@ public class UserController {
         }
     }
 
-    @GetMapping("/sendOTP")
-    public String oj(){
-        return "OTP Sent";
-    }
-
-    @PostMapping
-    public void validateOTP(){
-
+    @GetMapping("/secure")
+    public String getHello(HttpServletRequest request){
+        HttpSession session = request.getSession(false);
+        // This will print the null if there's no session.
+        System.out.println("Session ID: " + (session == null ? "null" : session.getId()));
+        return  "Hello World!";
     }
 
 }

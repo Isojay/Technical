@@ -48,8 +48,8 @@ public class CalculatorTest {
         when(file.getBytes()).thenReturn(bytes);
 
         CompanyDetails companyDetails = CompanyDetails.builder()
-                .cLocation(cLocation)
-                .cName(companyName)
+                .location(cLocation)
+                .name(companyName)
                 .document(docName)
                 .build();
 
@@ -70,8 +70,8 @@ public class CalculatorTest {
         verify(repo, times(1)).save(captor.capture());
 
         CompanyDetails saved = captor.getValue();
-        assertEquals(companyName, saved.getCName());
-        assertEquals(cLocation, saved.getCLocation());
+        assertEquals(companyName, saved.getName());
+        assertEquals(cLocation, saved.getLocation());
         assertEquals(docName, saved.getDocument());
     }
 
