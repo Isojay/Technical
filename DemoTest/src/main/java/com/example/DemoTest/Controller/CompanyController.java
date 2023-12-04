@@ -24,7 +24,6 @@ public class CompanyController {
 
         List<CompanyResponse> companies = service.findAll();
 
-
         if(companies.isEmpty()){
 
             return new ResponseEntity<>("No companies found.", HttpStatus.NO_CONTENT);
@@ -47,7 +46,6 @@ public class CompanyController {
 
     @DeleteMapping("/{id}")
     public String deleteDetails(@PathVariable long id){
-
         try {
             service.deleteDetails(id);
             return "Deletion Success";

@@ -8,7 +8,6 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -42,7 +41,7 @@ public class UserController {
         try {
             System.out.println(registerRequest);
             userService.registerUser(registerRequest);
-            return ResponseEntity.ok().body("User registration successful. A verification code is sent to your number please verify.");
+            return ResponseEntity.ok().body("User registration successful. \n Please verify phone Number to get access of your Account");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Unable to register user. Error: " + e.getMessage());
         }

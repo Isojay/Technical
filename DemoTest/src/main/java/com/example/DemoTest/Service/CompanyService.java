@@ -35,8 +35,8 @@ public class CompanyService {
             CompanyResponse response = CompanyResponse
                     .builder()
                     .id(detail.getId())
-                    .name(detail.getCName())
-                    .location(detail.getCLocation())
+                    .name(detail.getName())
+                    .location(detail.getLocation())
                     .document(detail.getDocument())
                     .build();
 
@@ -60,8 +60,8 @@ public class CompanyService {
 
         CompanyDetails details = CompanyDetails
                 .builder()
-                .cLocation(request.getLocation())
-                .cName(request.getName())
+                .location(request.getLocation())
+                .name(request.getName())
                 .document(docName)
                 .build();
 
@@ -78,12 +78,12 @@ public class CompanyService {
 
             CompanyDetails details = detail.get();
 
-            if (!Objects.equals(details.getCLocation(), companyRequest.getLocation())){
-                details.setCLocation(companyRequest.getLocation());
+            if (!Objects.equals(details.getLocation(), companyRequest.getLocation())){
+                details.setLocation(companyRequest.getLocation());
                 message.append("Location Changed.");
             }
-           if (!Objects.equals(details.getCName(), companyRequest.getName())) {
-               details.setCName(companyRequest.getName());
+           if (!Objects.equals(details.getName(), companyRequest.getName())) {
+               details.setName(companyRequest.getName());
                message.append(" Company Name Changed");
            }
 

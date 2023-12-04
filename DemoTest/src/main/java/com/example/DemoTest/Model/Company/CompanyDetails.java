@@ -20,10 +20,10 @@ public class CompanyDetails {
     private long id;
 
     @Column(name = "CompanyName")
-    private String cName;
+    private String name;
 
     @Column(name = "CompanyLocation")
-    private String cLocation;
+    private String location;
 
 
     private String document;
