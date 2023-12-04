@@ -26,18 +26,26 @@ public class UserService {
     }
 
     public void registerUser(RegisterRequest registerRequest) throws Exception {
-        if (userRepo.findByPhNumber(registerRequest.getPhNumber()) == null) {
-            System.out.println(registerRequest);
-            User user = User.builder()
-                    .uEmail(registerRequest.getEmail())
-                    .uPassword(bCryptPasswordEncoder.encode(registerRequest.getPassword()))
-                    .phNumber(registerRequest.getPhNumber())
-                    .validated(false)
-                    .build();
-            userRepo.save(user);
-        }else {
-            throw new Exception("User Already Registered");
-        }
+
+            String regexStr = "^[0-9]{10}$";
+
+            // Check if phone number is valid
+            if(!registerRequest.getPhNumber().matches(regexStr)) {
+                throw new Exception("Invalid phone number");
+            }
+
+            if (userRepo.findByPhNumber(registerRequest.getPhNumber()) == null) {
+                User user = User.builder()
+                        .uEmail(registerRequest.getEmail())
+                        .uPassword(bCryptPasswordEncoder.encode(registerRequest.getPassword()))
+                        .phNumber(registerRequest.getPhNumber())
+                        .validated(false)
+                        .build();
+                userRepo.save(user);
+            } else {
+                throw new Exception("User Already Registered");
+            }
+
 
     }
 
