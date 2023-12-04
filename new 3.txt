@@ -1,0 +1,28 @@
+Requirements:
+
+Spring Auth
+
+Create Spring Boot Rest API.
+Implement Spring Security that logs in using mobile number and password.
+Registration API
+Mobile phone validation API. Implement OTP validation logic
+Login API
+
+2. Spring CRUD [Use above app]
+
+Create a resource CRUD API for a company [company name, location, company documents]
+
+Architecture:
+Controller
+Model
+Service
+DAO
+
+
+3. Connect one Free Weather API and display weather information in API
+
+
+Deadline:
+5th December, 2023
+
+GIT share details

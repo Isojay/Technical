@@ -1,0 +1,30 @@
+package com.example.DemoTest.Model.Company;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Entity
+@Table(name = "Companies")
+public class CompanyDetails {
+
+    @Id
+    private long id;
+
+    @Column(name = "CompanyName")
+    private String cName;
+
+    @Column(name = "CompanyLocation")
+    private String cLocation;
+
+
+    private String document;
+}
