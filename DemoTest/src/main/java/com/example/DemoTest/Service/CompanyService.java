@@ -1,6 +1,5 @@
 package com.example.DemoTest.Service;
 
-
 import com.example.DemoTest.DTO.CompanyRequest;
 import com.example.DemoTest.DTO.CompanyResponse;
 import com.example.DemoTest.Model.Company.CompanyDetails;
@@ -22,41 +21,40 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CompanyService {
 
-    public static String Uploaddir =  System.getProperty("user.dir")+"/src/main/resources/static";
+    static String Uploaddir =  System.getProperty("user.dir")+"/src/main/resources/static";
 
     private final CompanyRepo repo;
 
-    public List<CompanyResponse> findAll(){
+    public List<CompanyResponse> findAll() {
 
         List<CompanyDetails> details = repo.findAll();
         List<CompanyResponse> responseList = new ArrayList<>();
 
-        for (CompanyDetails detail : details) {
-            CompanyResponse response = CompanyResponse
-                    .builder()
-                    .id(detail.getId())
-                    .name(detail.getName())
-                    .location(detail.getLocation())
-                    .document(detail.getDocument())
-                    .build();
+        if (!details.isEmpty()){
+            for (CompanyDetails detail : details) {
+                CompanyResponse response = CompanyResponse
+                        .builder()
+                        .id(detail.getId())
+                        .name(detail.getName())
+                        .location(detail.getLocation())
+                        .document(detail.getDocument())
+                        .build();
 
-            responseList.add(response);
+                responseList.add(response);
+            }
         }
-
         return responseList;
     }
 
-    public void saveDetails(CompanyRequest request , MultipartFile file) throws IOException {
+    public String saveDetails(CompanyRequest request , MultipartFile file) throws IOException {
 
         String docName;
-
         if(file.isEmpty()) {
-            throw new IllegalArgumentException("File must not be empty");
-        } else {
-            docName = file.getOriginalFilename();
-            Path filenameandPath = Paths.get(Uploaddir, docName);
-            Files.write(filenameandPath, file.getBytes());
+            return "File must not be empty";
         }
+        docName = file.getOriginalFilename();
+        Path filenameandPath = Paths.get(Uploaddir, docName);
+        Files.write(filenameandPath, file.getBytes());
 
         CompanyDetails details = CompanyDetails
                 .builder()
@@ -65,16 +63,17 @@ public class CompanyService {
                 .document(docName)
                 .build();
 
-            repo.save(details);
+        repo.save(details);
+        return "Details saved successfully";
     }
 
-   public String editDetails(CompanyRequest companyRequest){
+    public String editDetails(CompanyRequest companyRequest) {
 
         Optional<CompanyDetails> detail = repo.findById(companyRequest.getId());
 
         StringBuilder message = new StringBuilder();
 
-        if (detail.isPresent()){
+        if (detail.isPresent()) {
 
             CompanyDetails details = detail.get();
 
@@ -82,23 +81,26 @@ public class CompanyService {
                 details.setLocation(companyRequest.getLocation());
                 message.append("Location Changed.");
             }
-           if (!Objects.equals(details.getName(), companyRequest.getName())) {
-               details.setName(companyRequest.getName());
-               message.append(" Company Name Changed");
-           }
-            if(message.isEmpty()){
-                message.append("Nothing Changes");
+            if (!Objects.equals(details.getName(), companyRequest.getName())) {
+                details.setName(companyRequest.getName());
+                message.append(" Company Name Changed");
             }
+
             repo.save(details);
-
-
         }
-        return  message.toString();
 
+        if (message.isEmpty()){
+            message.append("Nothing Changes");
+        }
+        return message.toString();
     }
 
-    public void deleteDetails(long id){
-        repo.deleteById(id);
+    public String deleteDetails(long id) {
+        if (repo.findById(id).isPresent()) {
+            repo.deleteById(id);
+            return "Deletion Success";
+        } else {
+            return "Deletion Unsuccessful. Given Company not Found";
+        }
     }
-
 }

@@ -5,12 +5,12 @@ import com.example.DemoTest.DTO.RegisterRequest;
 import com.example.DemoTest.Service.UserService;
 import com.example.DemoTest.Utils.OTPgenerator;
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -35,42 +35,37 @@ public class UserController {
 
             userService.registerUser(request);
         }
-        OTPgenerator otPgenerator = new OTPgenerator();
-        System.out.println(otPgenerator.generateRandomString());
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
         try {
             userService.registerUser(registerRequest);
-            return ResponseEntity.ok().body("User registration successful. \n Please verify phone Number to get access of your Account");
+            return ResponseEntity.ok().body("User registration successful. \nPlease verify phone Number to get access of your Account");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Unable to register user. Error: " + e.getMessage());
+            return new ResponseEntity<>("Unable to register user. Error: " + e.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
     @GetMapping("/logIn")
-    public ResponseEntity<?> authUser(@RequestBody AuthRequest request , HttpServletRequest servletRequest){
+    public ResponseEntity<?> authUser(@RequestBody AuthRequest request){
         try {
-
-            if(userService.authenticate(request)){
-                HttpSession session = servletRequest.getSession();
-                System.out.println("Session ID: " + session.getId());
-                return new ResponseEntity<>("Log In Successful", HttpStatus.OK);
+            String token = userService.authenticate(request);
+            if(userService.authenticate(request)!= null){
+                return new ResponseEntity<>("Log In Successful \n Your JWT Token : "+ token, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("Mobile Verification Required. Please validate your login details and try again.", HttpStatus.UNAUTHORIZED);
             }
-        } catch (Exception e){
+        } catch (BadCredentialsException e){
             System.out.println(e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
             return new ResponseEntity<>("An error occurred while processing your request. Please try again later.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/secure")
-    public String getHello(HttpServletRequest request){
-        HttpSession session = request.getSession(false);
-        // This will print the null if there's no session.
-        System.out.println("Session ID: " + (session == null ? "null" : session.getId()));
-        return  "Hello World!";
+    public String getHello(){
+        return  "This is from Authenticated Test";
     }
 
 }

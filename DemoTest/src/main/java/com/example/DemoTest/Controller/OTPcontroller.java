@@ -32,11 +32,10 @@ public class OTPcontroller {
 
     }
 
-    @GetMapping("/validate")
+    @GetMapping("/validateOTP")
     public ResponseEntity<?> validateOTP(String phNumber, String OTP){
 
         try{
-
             String message = otPservice.validateOTP(phNumber,OTP);
             return new ResponseEntity<>(message, HttpStatus.OK);
 

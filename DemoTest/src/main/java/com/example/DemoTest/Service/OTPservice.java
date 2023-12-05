@@ -38,8 +38,7 @@ public class OTPservice {
                         .build();
 
                 oTPrepo.save(otPvalidator);
-                String message = "OTP is successfully sent to your Number \n" + createOTPMessage(phoneNumber, otp);
-                return message;
+                return "OTP is successfully sent to your Number \n" + createOTPMessage(phoneNumber, otp);
 
             } else {
                 return "Phone Number is Already Verified";

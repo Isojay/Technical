@@ -17,43 +17,29 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CompanyController {
 
-   private final CompanyService service;
+    private final CompanyService service;
 
     @GetMapping
-    public ResponseEntity<?> getDetails(){
-
+    public ResponseEntity<List<CompanyResponse>> getDetails() {
         List<CompanyResponse> companies = service.findAll();
-
-        if(companies.isEmpty()){
-
-            return new ResponseEntity<>("No companies found.", HttpStatus.NO_CONTENT);
-        }else{
-            return new ResponseEntity<>(companies, HttpStatus.OK);
-        }
-
+        return new ResponseEntity<>(companies, HttpStatus.OK);
     }
 
-    @PostMapping
-    public void saveDetails(@RequestBody CompanyRequest request, @RequestParam("document") MultipartFile file) throws IOException {
-        service.saveDetails(request,file);
+    @PostMapping("/secure")
+    public ResponseEntity<String> saveDetails(@RequestBody CompanyRequest request, @RequestParam("document") MultipartFile file) throws IOException {
+        String message = service.saveDetails(request, file);
+        return new ResponseEntity<>(message, HttpStatus.CREATED);
     }
 
-    @PutMapping
-    public String editDetails(@RequestBody CompanyRequest request){
-
-       return service.editDetails(request);
+    @PutMapping("/secure")
+    public ResponseEntity<String> editDetails(@RequestBody CompanyRequest request){
+        String message = service.editDetails(request);
+        return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
-    public String deleteDetails(@PathVariable long id){
-        try {
-            service.deleteDetails(id);
-            return "Deletion Success";
-        }catch (Exception e){
-            return e.getMessage();
-        }
-
+    @DeleteMapping("/secure/{id}")
+    public ResponseEntity<String> deleteDetails(@PathVariable long id) throws Exception {
+        String message = service.deleteDetails(id);
+        return message.equals("Deletion Success") ? new ResponseEntity<>(message, HttpStatus.OK) : new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
-
-
 }

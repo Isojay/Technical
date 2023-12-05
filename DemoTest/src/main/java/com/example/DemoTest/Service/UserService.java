@@ -2,10 +2,11 @@ package com.example.DemoTest.Service;
 
 import com.example.DemoTest.DTO.AuthRequest;
 import com.example.DemoTest.DTO.RegisterRequest;
+import com.example.DemoTest.JWT.JwtService;
+import com.example.DemoTest.Model.Role;
 import com.example.DemoTest.Model.User;
 import com.example.DemoTest.Repository.UserRepo;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -20,6 +21,7 @@ public class UserService {
     private final UserRepo userRepo;
     private final PasswordEncoder bCryptPasswordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
     public User findByNumber(String number){
         return userRepo.findByPhNumber(number);
@@ -40,6 +42,7 @@ public class UserService {
                         .uPassword(bCryptPasswordEncoder.encode(registerRequest.getPassword()))
                         .phNumber(registerRequest.getPhNumber())
                         .validated(false)
+                        .role(Role.USER)
                         .build();
                 userRepo.save(user);
             } else {
@@ -49,13 +52,21 @@ public class UserService {
 
     }
 
-    public Boolean authenticate(AuthRequest request) throws Exception {
+    public String authenticate(AuthRequest request){
+
         if(findByNumber(request.getPhNumber()) != null) {
 
-            return authenticateUser(request) && isUserEnabled(request.getPhNumber());
+            if (authenticateUser(request) && isUserEnabled(request.getPhNumber())){
+
+                User user = findByNumber(request.getPhNumber());
+                return jwtService.generateToken(user);
+
+            }else {
+                return null;
+            }
 
         }else {
-            throw new Exception("User Credential Not found");
+            throw new BadCredentialsException("User Credential Not found");
         }
     }
 
