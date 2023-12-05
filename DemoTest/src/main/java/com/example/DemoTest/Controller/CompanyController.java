@@ -20,8 +20,11 @@ public class CompanyController {
     private final CompanyService service;
 
     @GetMapping
-    public ResponseEntity<List<CompanyResponse>> getDetails() {
+    public ResponseEntity<?> getDetails() {
         List<CompanyResponse> companies = service.findAll();
+        if (companies == null){
+            return new ResponseEntity<>("No Companies", HttpStatus.NO_CONTENT);
+        }
         return new ResponseEntity<>(companies, HttpStatus.OK);
     }
 

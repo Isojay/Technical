@@ -1,5 +1,6 @@
 package com.example.DemoTest.JWT;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.security.SignatureException;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -39,10 +42,13 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7);
         try {
             userEmail = jwtService.extractUsername(jwt);
-        } catch (JwtException e) {
-            sendErrorResponse(response, e.getMessage());
+        } catch (SignatureException e) {
+            sendErrorResponse(response, e.getMessage(),"Valid");
             return;
-        } catch (Exception e) {
+        }catch (ExpiredJwtException e) {
+            sendErrorResponse(response,"The JWT Token is Expired","Time Out");
+            return;
+        }  catch (Exception e) {
             throw new RuntimeException(e);
         }
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null){
@@ -59,17 +65,26 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                     );
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
-            } catch (Exception e) {
-                sendErrorResponse(response,"The JWT Token is Expired");
-                return;
+            }catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
         filterChain.doFilter(request,response);
     }
 
-    private void sendErrorResponse(HttpServletResponse response, String message) throws IOException {
+    private void sendErrorResponse(HttpServletResponse response, String message, String cause) throws IOException {
+        int responseStatus ;
+
+        if ("Time Out".equals(cause)) {
+            responseStatus = HttpServletResponse.SC_REQUEST_TIMEOUT;
+        } else {
+            responseStatus = HttpServletResponse.SC_UNAUTHORIZED;
+        }
+
         response.setContentType("application/json");
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);  // Or any other suitable HTTP status
-        response.getOutputStream().println("{ \"error\": \"" + message + "\" }");
+        response.setStatus(responseStatus);
+
+        String jsonResponse = String.format("{\"error\": \"%s\"}", message);
+        response.getOutputStream().println(jsonResponse);
     }
 }

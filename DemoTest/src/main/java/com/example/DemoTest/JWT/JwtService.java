@@ -1,9 +1,6 @@
 package com.example.DemoTest.JWT;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.security.SignatureException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,6 +46,7 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) throws Exception {
+
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
@@ -67,9 +66,12 @@ public class JwtService {
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-        } catch (Exception e) {
+        }catch (ExpiredJwtException e){
+            throw new ExpiredJwtException(e.getHeader(), e.getClaims(), e.getMessage(), e);
+        }
+        catch (JwtException e) {
             log.error("Error parsing JWT with message: " + e.getMessage());
-            throw new JwtException(e.getMessage());
+            throw new SignatureException(e.getMessage());
         }
     }
 
