@@ -5,11 +5,14 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.security.SignatureException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,19 +35,35 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        Map<String, Object> claims = new HashMap<>();
+        Collection<? extends GrantedAuthority> roles = userDetails.getAuthorities();
+
+        Map<String, Object> userInfo = new HashMap<>();
+
+        userInfo.put("USER_ID", userDetails.getUsername());
+
+        String role = roles.contains(new SimpleGrantedAuthority("ADMIN")) ? "ADMIN" :
+                roles.contains(new SimpleGrantedAuthority("USER")) ? "USER" : null;
+
+        if (role != null) {
+            userInfo.put("USER_ROLE", role);
+        }
+
+        claims.put("userInfo", userInfo);
+
+        return generateTokenWithClaims(claims, userDetails);
     }
 
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+    private String generateTokenWithClaims(Map<String, Object> claims, UserDetails userDetails) {
+        System.out.println(claims);
         return Jwts.builder()
-                .setClaims(extraClaims)
+                .setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
-
     public boolean isTokenValid(String token, UserDetails userDetails) throws Exception {
 
         final String username = extractUsername(token);

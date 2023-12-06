@@ -22,7 +22,7 @@ public class CompanyController {
     @GetMapping
     public ResponseEntity<?> getDetails() {
         List<CompanyResponse> companies = service.findAll();
-        if (companies == null){
+        if (companies.isEmpty()){
             return new ResponseEntity<>("No Companies", HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(companies, HttpStatus.OK);
@@ -45,4 +45,10 @@ public class CompanyController {
         String message = service.deleteDetails(id);
         return message.equals("Deletion Success") ? new ResponseEntity<>(message, HttpStatus.OK) : new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
+
+    @GetMapping("/secure/authTest")
+    public String authTest(){
+        return  "This is from Authenticated Test";
+    }
+
 }
