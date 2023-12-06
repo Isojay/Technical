@@ -41,6 +41,7 @@ public class JwtService {
         Map<String, Object> userInfo = new HashMap<>();
 
         userInfo.put("USER_ID", userDetails.getUsername());
+        userInfo.put("IsAuthenticated", true);
 
         String role = roles.contains(new SimpleGrantedAuthority("ADMIN")) ? "ADMIN" :
                 roles.contains(new SimpleGrantedAuthority("USER")) ? "USER" : null;
@@ -55,7 +56,7 @@ public class JwtService {
     }
 
     private String generateTokenWithClaims(Map<String, Object> claims, UserDetails userDetails) {
-        System.out.println(claims);
+        log.info(claims.toString());
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())

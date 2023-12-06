@@ -19,10 +19,10 @@ public class OTPcontroller {
     private final OTPservice otPservice;
 
     @GetMapping("/generateOTP")
-    public ResponseEntity<String> generateOTP(@RequestParam String phNumber){
-
+    public ResponseEntity<String> generateOTP(@RequestParam String phNumber, @RequestParam String using){
+        log.info(using);
         try{
-            String message = otPservice.generateAndSendOTP(phNumber);
+            String message = otPservice.generateAndSendOTP(phNumber, using);
             return new ResponseEntity<>(message, HttpStatus.OK);
 
         }catch (Exception e){
