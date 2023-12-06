@@ -27,9 +27,10 @@ public class CompanyController {
         }
         return new ResponseEntity<>(companies, HttpStatus.OK);
     }
-
+    
     @PostMapping("/secure")
-    public ResponseEntity<String> saveDetails(@RequestBody CompanyRequest request, @RequestParam("document") MultipartFile file) throws IOException {
+    public ResponseEntity<String> saveDetails(@RequestPart("request") CompanyRequest request,
+                                              @RequestPart("document") MultipartFile file) throws IOException {
         String message = service.saveDetails(request, file);
         return new ResponseEntity<>(message, HttpStatus.CREATED);
     }

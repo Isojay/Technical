@@ -96,9 +96,23 @@ public class CompanyService {
     }
 
     public String deleteDetails(long id) {
-        if (repo.findById(id).isPresent()) {
-            repo.deleteById(id);
-            return "Deletion Success";
+        Optional<CompanyDetails> companyDetailsOpt = repo.findById(id);
+
+        if (companyDetailsOpt.isPresent()) {
+            CompanyDetails companyDetails = companyDetailsOpt.get();
+
+            Path fileToDeletePath = Paths.get(Uploaddir, companyDetails.getDocument());
+
+            try {
+                Files.delete(fileToDeletePath);
+
+                repo.deleteById(id);
+
+                return "Deletion Success";
+            } catch (IOException e) {
+                // The file delete operation failed, perhaps handle this case differently
+                return "File deletion failed";
+            }
         } else {
             return "Deletion Unsuccessful. Given Company not Found";
         }

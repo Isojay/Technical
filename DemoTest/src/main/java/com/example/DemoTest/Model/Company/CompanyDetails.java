@@ -17,6 +17,7 @@ import java.util.List;
 public class CompanyDetails {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(name = "CompanyName")
