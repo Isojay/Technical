@@ -2,12 +2,10 @@ package com.example.DemoTest.Controller;
 
 import com.example.DemoTest.DTO.AuthRequest;
 import com.example.DemoTest.DTO.RegisterRequest;
-import com.example.DemoTest.Service.UserService;
-import com.example.DemoTest.Utils.OTPgenerator;
+import com.example.DemoTest.Service.AuthService;
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -15,16 +13,16 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
-public class UserController {
+@RequestMapping("/api/user")
+@Slf4j
+public class AuthController {
 
 
-    private final UserService userService;
+    private final AuthService authService;
 
     @PostConstruct
     public void adminEnter() throws Exception {
-
-        if (userService.findByNumber("9808274990") == null){
+        if (authService.findByNumber("9808274990") == null){
             RegisterRequest request = RegisterRequest
                     .builder()
                     .name("Bijay Shrestha")
@@ -33,14 +31,14 @@ public class UserController {
                     .password("Hello123")
                     .build();
 
-            userService.registerUser(request);
+            authService.registerUser(request);
         }
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
         try {
-            userService.registerUser(registerRequest);
+            authService.registerUser(registerRequest);
             return ResponseEntity.ok().body("User registration successful. \nPlease verify phone Number to get access of your Account");
         } catch (Exception e) {
             return new ResponseEntity<>("Unable to register user. Error: " + e.getMessage(),HttpStatus.BAD_REQUEST);
@@ -49,8 +47,8 @@ public class UserController {
     @GetMapping("/logIn")
     public ResponseEntity<?> authUser(@RequestBody AuthRequest request){
         try {
-            String token = userService.authenticate(request);
-            if(userService.authenticate(request)!= null){
+            String token = authService.authenticate(request);
+            if(authService.authenticate(request)!= null){
                 return new ResponseEntity<>("Log In Successful \n Your JWT Token : "+ token, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("Mobile Verification Required. Please validate your login details and try again.", HttpStatus.UNAUTHORIZED);
@@ -63,9 +61,6 @@ public class UserController {
         }
     }
 
-    @GetMapping("/secure")
-    public String getHello(){
-        return  "This is from Authenticated Test";
-    }
+
 
 }

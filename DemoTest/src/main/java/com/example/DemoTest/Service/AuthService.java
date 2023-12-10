@@ -7,6 +7,7 @@ import com.example.DemoTest.Model.Role;
 import com.example.DemoTest.Model.User;
 import com.example.DemoTest.Repository.UserRepo;
 
+import com.example.DemoTest.Utils.UserIdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class AuthService {
 
     private final UserRepo userRepo;
     private final PasswordEncoder bCryptPasswordEncoder;
@@ -36,15 +37,26 @@ public class UserService {
                 throw new Exception("Invalid phone number");
             }
 
-            if (userRepo.findByPhNumber(registerRequest.getPhNumber()) == null) {
+            User userCheck = userRepo.findByPhNumber(registerRequest.getPhNumber());
+
+            if (userCheck == null) {
+
+                if (userRepo.findByEmail(registerRequest.getEmail()) != null){
+                    throw new Exception("Email is Already Registered. Try again with different Email");
+                }
+
+                UserIdGenerator userIdGenerator = new UserIdGenerator();
+
                 User user = User.builder()
-                        .uEmail(registerRequest.getEmail())
+                        .uId(userIdGenerator.generateRandomString())
+                        .email(registerRequest.getEmail())
                         .uPassword(bCryptPasswordEncoder.encode(registerRequest.getPassword()))
                         .phNumber(registerRequest.getPhNumber())
                         .validated(false)
                         .role(Role.USER)
                         .build();
                 userRepo.save(user);
+
             } else {
                 throw new Exception("User Already Registered");
             }

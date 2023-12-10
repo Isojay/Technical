@@ -23,15 +23,15 @@ import java.util.List;
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long uId;
+    @NotNull
+    private String uId;
 
     @Column(name = "userName")
     private String uName;
 
 
     @Column(name = "userEmail")
-    private String uEmail;
+    private String email;
 
     @NotNull
     @Column(name = "userPhone")

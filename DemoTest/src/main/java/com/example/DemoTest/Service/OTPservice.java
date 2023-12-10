@@ -67,11 +67,6 @@ public class OTPservice {
         return sendTo + message1;
     }
 
-
-
-
-
-
     public String validateOTP(String phoneNumber, String code) throws Exception {
         OTPvalidator otpValidator = oTPrepo.findByPhNumber(phoneNumber);
         if (otpValidator.getCode() != null && otpValidator.getCode().equals(code)) {
